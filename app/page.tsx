@@ -584,7 +584,7 @@ function WeatherApp() {
             </h1>
           </div>
           <p className="text-white/95 text-base sm:text-2xl font-medium mb-4">
-            Beautiful weather, beautifully presented
+            Weather goals, aesthetic achieved
           </p>
           <div className="flex items-center justify-center space-x-4 sm:space-x-8 mt-4 sm:mt-6 text-white/80 text-sm sm:text-lg">
             <div className="flex items-center space-x-2">
@@ -1234,47 +1234,47 @@ function WeatherApp() {
 
         {/* Enhanced Footer */}
         <footer className="text-center mt-12 sm:mt-20 text-white/70 space-y-3 sm:space-y-4">
-          <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-6 text-sm sm:text-base">
-            <span>Built with ❤ and way too much ☕</span>
-            <span className="hidden sm:inline">•</span>
-            <span>Real-time updates with 6-day & hourly forecasts</span>
-          </div>
+          
+{/* Developer Links */}
+<div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-4 text-xs sm:text-sm">
+  <span className="text-white/60">Developed by Sujan Das</span>
+  <div className="flex items-center space-x-4">
+    <a
+      href="https://github.com/devsujandas"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-white/60 hover:text-white transition-colors duration-300 flex items-center space-x-1"
+    >
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub" className="w-4 h-4" />
+      <span>GitHub</span>
+    </a>
+    <a
+      href="https://in.linkedin.com/in/devsujandas"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-white/60 hover:text-white transition-colors duration-300 flex items-center space-x-1"
+    >
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linkedin/linkedin-original.svg" alt="LinkedIn" className="w-4 h-4" />
+      <span>LinkedIn</span>
+    </a>
+    <a
+      href="https://www.sujandas.info/"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-white/60 hover:text-white transition-colors duration-300 flex items-center space-x-1"
+    >
+      <img src="https://cdn-icons-png.flaticon.com/512/69/69524.png" alt="Portfolio" className="w-4 h-4" />
+      <span>Portfolio</span>
+    </a>
+  </div>
+</div>
+
           <div className="flex items-center justify-center space-x-2 sm:space-x-3 text-xs sm:text-sm">
             <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" />
             <span>Powered by OpenWeatherMap API</span>
             <Star className="w-3 h-3 animate-pulse" />
           </div>
 
-          {/* Developer Links */}
-          <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-4 text-xs sm:text-sm">
-            <span className="text-white/60">Developed by Sujan Das</span>
-            <div className="flex items-center space-x-4">
-              <a
-                href="https://github.com/devsujandas"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white/60 hover:text-white transition-colors duration-300 flex items-center space-x-1"
-              >
-                <span>GitHub</span>
-              </a>
-              <a
-                href="https://in.linkedin.com/in/devsujandas"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white/60 hover:text-white transition-colors duration-300 flex items-center space-x-1"
-              >
-                <span>LinkedIn</span>
-              </a>
-              <a
-                href="https://www.sujandas.info/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white/60 hover:text-white transition-colors duration-300 flex items-center space-x-1"
-              >
-                <span>Portfolio</span>
-              </a>
-            </div>
-          </div>
 
           <div className="text-xs text-white/50">v2.1.3 • Enhanced with better performance and error handling</div>
         </footer>
