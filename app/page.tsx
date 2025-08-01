@@ -224,13 +224,13 @@ function WeatherApp() {
           let message = "Failed to get location"
           switch (error.code) {
             case error.PERMISSION_DENIED:
-              message = "Location access denied. Please enable location services and try again."
+              message = "Location access denied. You can still search for cities manually."
               break
             case error.POSITION_UNAVAILABLE:
-              message = "Location information is unavailable. Please try again."
+              message = "Location information is unavailable. Please try searching for a city."
               break
             case error.TIMEOUT:
-              message = "Location request timed out. Please try again."
+              message = "Location request timed out. Please try searching for a city."
               break
           }
           reject(new Error(message))
@@ -292,9 +292,9 @@ function WeatherApp() {
             throw new Error("Invalid weather data received")
           }
         } catch (locationError) {
-          console.warn("Location access failed, trying default city:", locationError)
+          console.warn("Location access failed, loading default city:", locationError)
 
-          // Try a few different default cities
+          // If location fails, just load a default city without showing error
           const fallbackCities = ["London", "New York", "Tokyo", "Paris"]
           let weatherData = null
 
@@ -303,9 +303,7 @@ function WeatherApp() {
               weatherData = await getWeatherByCity(city)
               if (weatherData && weatherData.current) {
                 setWeather(weatherData)
-                setError(
-                  `Using ${city} as default location. Click 'Use Current Location' to get weather for your area.`,
-                )
+                // Don't show error for location permission denial - just use default
                 break
               }
             } catch (cityError) {
@@ -315,7 +313,7 @@ function WeatherApp() {
           }
 
           if (!weatherData) {
-            throw new Error("Unable to load weather data from any location. Please check your API key configuration.")
+            throw new Error("Unable to load weather data. Please check your API key configuration.")
           }
         }
       } catch (err) {
@@ -540,10 +538,10 @@ function WeatherApp() {
         <LoadingSpinner
           message={
             locationPermission === "prompt"
-              ? "🌍 Requesting location access..."
+              ? "Requesting location access..."
               : locationPermission === "granted"
-                ? "📍 Fetching your local weather..."
-                : "🏙️ Loading default weather data..."
+                ? "Fetching your local weather..."
+                : "Loading weather data..."
           }
         />
       </div>
@@ -586,7 +584,7 @@ function WeatherApp() {
             </h1>
           </div>
           <p className="text-white/95 text-base sm:text-2xl font-medium mb-4">
-            ✨ Beautiful weather, beautifully presented ✨
+            Beautiful weather, beautifully presented
           </p>
           <div className="flex items-center justify-center space-x-4 sm:space-x-8 mt-4 sm:mt-6 text-white/80 text-sm sm:text-lg">
             <div className="flex items-center space-x-2">
@@ -624,7 +622,7 @@ function WeatherApp() {
                 onChange={(e) => handleSearchChange(e.target.value)}
                 onFocus={() => setShowSuggestions(true)}
                 onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                placeholder="🌍 Search for any city worldwide..."
+                placeholder="Search for any city worldwide..."
                 className="flex-1 bg-transparent text-white placeholder-white/70 outline-none px-3 sm:px-5 py-3 sm:py-5 text-base sm:text-xl relative z-10"
                 disabled={searchLoading || !isOnline}
               />
@@ -718,17 +716,7 @@ function WeatherApp() {
             ) : (
               <Navigation2 className="w-4 h-4 sm:w-5 sm:h-5 relative z-10 group-hover:scale-110 transition-transform duration-300" />
             )}
-            <span className="font-bold relative z-10">{locationLoading ? "Getting..." : "📍 Location"}</span>
-          </button>
-
-          {/* API Test Button */}
-          <button
-            onClick={handleApiTest}
-            className="location-button flex items-center space-x-2 text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3 relative overflow-hidden group"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-white/10 to-white/20 group-hover:from-white/30 group-hover:to-white/30 transition-all duration-300"></div>
-            <TestTube className="w-4 h-4 sm:w-5 sm:h-5 relative z-10" />
-            <span className="font-bold relative z-10">Test API</span>
+            <span className="font-bold relative z-10">{locationLoading ? "Getting..." : "Use Location"}</span>
           </button>
 
           {/* Settings Button */}
@@ -741,33 +729,6 @@ function WeatherApp() {
             <span className="font-bold relative z-10">Settings</span>
           </button>
         </div>
-
-        {/* API Status Display */}
-        {showApiTest && apiStatus && (
-          <div className="mb-8 fade-in-up">
-            <div
-              className={`glass-card p-4 sm:p-6 text-white max-w-md mx-auto ${apiStatus.success ? "border-green-400/30" : "border-red-400/30"}`}
-            >
-              <h3 className="text-lg font-bold mb-4 flex items-center space-x-2">
-                <TestTube className="w-5 h-5" />
-                <span>API Connection Test</span>
-              </h3>
-              <div className={`p-3 rounded-lg ${apiStatus.success ? "bg-green-500/20" : "bg-red-500/20"}`}>
-                <div className="flex items-center space-x-2 mb-2">
-                  <div className={`w-3 h-3 rounded-full ${apiStatus.success ? "bg-green-400" : "bg-red-400"}`}></div>
-                  <span className="font-semibold">{apiStatus.success ? "Success" : "Failed"}</span>
-                </div>
-                <p className="text-sm text-white/90">{apiStatus.message}</p>
-              </div>
-              <button
-                onClick={() => setShowApiTest(false)}
-                className="mt-4 w-full bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-all duration-300"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Settings Panel */}
         {showSettings && (
@@ -799,7 +760,45 @@ function WeatherApp() {
                   <Info className="w-3 h-3 inline mr-1" />
                   Auto-refresh updates weather every 10 minutes
                 </div>
+
+                {/* API Test Button in Settings */}
+                <div className="pt-4 border-t border-white/20">
+                  <button
+                    onClick={handleApiTest}
+                    className="w-full bg-gradient-to-r from-white/20 to-white/10 hover:from-white/30 hover:to-white/20 px-4 py-3 rounded-xl text-white font-bold transition-all duration-300 flex items-center justify-center space-x-2"
+                  >
+                    <TestTube className="w-4 h-4" />
+                    <span>Test API Connection</span>
+                  </button>
+                </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* API Status Display */}
+        {showApiTest && apiStatus && (
+          <div className="mb-8 fade-in-up">
+            <div
+              className={`glass-card p-4 sm:p-6 text-white max-w-md mx-auto ${apiStatus.success ? "border-green-400/30" : "border-red-400/30"}`}
+            >
+              <h3 className="text-lg font-bold mb-4 flex items-center space-x-2">
+                <TestTube className="w-5 h-5" />
+                <span>API Connection Test</span>
+              </h3>
+              <div className={`p-3 rounded-lg ${apiStatus.success ? "bg-green-500/20" : "bg-red-500/20"}`}>
+                <div className="flex items-center space-x-2 mb-2">
+                  <div className={`w-3 h-3 rounded-full ${apiStatus.success ? "bg-green-400" : "bg-red-400"}`}></div>
+                  <span className="font-semibold">{apiStatus.success ? "Success" : "Failed"}</span>
+                </div>
+                <p className="text-sm text-white/90">{apiStatus.message}</p>
+              </div>
+              <button
+                onClick={() => setShowApiTest(false)}
+                className="mt-4 w-full bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-all duration-300"
+              >
+                Close
+              </button>
             </div>
           </div>
         )}
@@ -818,7 +817,7 @@ function WeatherApp() {
                   disabled={!isOnline}
                   className="bg-gradient-to-r from-white/25 to-white/15 hover:from-white/35 hover:to-white/25 disabled:opacity-50 px-6 sm:px-8 py-3 rounded-xl text-white font-bold transition-all duration-300 text-sm sm:text-base"
                 >
-                  🔄 Try Again
+                  Try Again
                 </button>
                 <button
                   onClick={handleLocationUpdate}
@@ -826,14 +825,7 @@ function WeatherApp() {
                   className="bg-gradient-to-r from-blue-500/25 to-purple-500/15 hover:from-blue-500/35 hover:to-purple-500/25 disabled:opacity-50 px-6 sm:px-8 py-3 rounded-xl text-white font-bold transition-all duration-300 flex items-center justify-center space-x-2 text-sm sm:text-base"
                 >
                   <Navigation className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span>📍 Use Location</span>
-                </button>
-                <button
-                  onClick={handleApiTest}
-                  className="bg-gradient-to-r from-purple-500/25 to-pink-500/15 hover:from-purple-500/35 hover:to-pink-500/25 px-6 sm:px-8 py-3 rounded-xl text-white font-bold transition-all duration-300 flex items-center justify-center space-x-2 text-sm sm:text-base"
-                >
-                  <TestTube className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span>🔧 Test API</span>
+                  <span>Use Location</span>
                 </button>
               </div>
             </div>
@@ -935,7 +927,7 @@ function WeatherApp() {
                         : "text-white/70 hover:text-white hover:bg-white/15"
                     }`}
                   >
-                    📅 5-Day Forecast
+                    6-Day Forecast
                   </button>
                   <button
                     onClick={() => setActiveTab("hourly")}
@@ -945,14 +937,14 @@ function WeatherApp() {
                         : "text-white/70 hover:text-white hover:bg-white/15"
                     }`}
                   >
-                    ⏰ Hourly Forecast
+                    Hourly Forecast
                   </button>
                 </div>
               </div>
 
-              {/* Enhanced 5-Day Forecast */}
+              {/* Enhanced 6-Day Forecast */}
               {activeTab === "daily" && weather.forecast && weather.forecast.length > 0 && (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
                   {weather.forecast.map((day, index) => (
                     <div
                       key={index}
@@ -976,8 +968,8 @@ function WeatherApp() {
                         </div>
                         <div className="text-xs sm:text-sm text-white/90 capitalize font-medium">{day.description}</div>
                         <div className="flex justify-between text-xs sm:text-sm text-white/70">
-                          <span>💧 {day.pop}%</span>
-                          <span>💨 {day.windSpeed} km/h</span>
+                          <span>{day.pop}% rain</span>
+                          <span>{day.windSpeed} km/h</span>
                         </div>
                       </div>
                     </div>
@@ -990,7 +982,7 @@ function WeatherApp() {
                 <div className="relative">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-xl sm:text-2xl font-bold text-white bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-                      ⏰ Next 24 Hours
+                      Next 24 Hours
                     </h3>
                     <div className="flex space-x-3">
                       <button
@@ -1037,8 +1029,8 @@ function WeatherApp() {
                           <div className="text-xs sm:text-sm text-white/70">
                             Feels {convertTemperature(hour.feelsLike)}°
                           </div>
-                          <div className="text-xs sm:text-sm text-white/70">💧 {hour.pop}%</div>
-                          <div className="text-xs sm:text-sm text-white/70">💨 {hour.windSpeed} km/h</div>
+                          <div className="text-xs sm:text-sm text-white/70">{hour.pop}% rain</div>
+                          <div className="text-xs sm:text-sm text-white/70">{hour.windSpeed} km/h</div>
                         </div>
                       </div>
                     ))}
@@ -1065,8 +1057,8 @@ function WeatherApp() {
                 </div>
                 <div className="text-sm sm:text-base text-white/70 mt-2 sm:mt-3">
                   {weather.current.feelsLike > weather.current.temperature
-                    ? "🔥 Warmer than actual"
-                    : "❄️ Cooler than actual"}
+                    ? "Warmer than actual"
+                    : "Cooler than actual"}
                 </div>
               </div>
 
@@ -1085,7 +1077,7 @@ function WeatherApp() {
                   {weather.current.windSpeed} km/h
                 </div>
                 <div className="text-sm sm:text-base text-white/70 mt-2 sm:mt-3">
-                  🧭 From {getWindDirection(weather.current.windDirection)} ({weather.current.windDirection}°)
+                  From {getWindDirection(weather.current.windDirection)} ({weather.current.windDirection}°)
                 </div>
               </div>
 
@@ -1103,7 +1095,7 @@ function WeatherApp() {
                 <div className="text-3xl sm:text-5xl font-bold bg-gradient-to-r from-white to-orange-200 bg-clip-text text-transparent">
                   {weather.current.pressure}
                 </div>
-                <div className="text-sm sm:text-base text-white/70 mt-2 sm:mt-3">📊 hPa</div>
+                <div className="text-sm sm:text-base text-white/70 mt-2 sm:mt-3">hPa</div>
               </div>
 
               {/* Humidity Details */}
@@ -1121,11 +1113,7 @@ function WeatherApp() {
                   {weather.current.humidity}%
                 </div>
                 <div className="text-sm sm:text-base text-white/70 mt-2 sm:mt-3">
-                  {weather.current.humidity > 70
-                    ? "💧 Very humid"
-                    : weather.current.humidity > 40
-                      ? "😌 Comfortable"
-                      : "🏜️ Dry"}
+                  {weather.current.humidity > 70 ? "Very humid" : weather.current.humidity > 40 ? "Comfortable" : "Dry"}
                 </div>
               </div>
 
@@ -1144,11 +1132,7 @@ function WeatherApp() {
                   {weather.current.visibility} km
                 </div>
                 <div className="text-sm sm:text-base text-white/70 mt-2 sm:mt-3">
-                  {weather.current.visibility > 10
-                    ? "🌟 Excellent"
-                    : weather.current.visibility > 5
-                      ? "👍 Good"
-                      : "🌫️ Poor"}
+                  {weather.current.visibility > 10 ? "Excellent" : weather.current.visibility > 5 ? "Good" : "Poor"}
                 </div>
               </div>
 
@@ -1202,7 +1186,7 @@ function WeatherApp() {
             {favoriteLocations.length > 0 && (
               <div className="fade-in-up">
                 <h3 className="text-xl sm:text-2xl font-bold text-white mb-6 text-center bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-                  ⭐ Favorite Locations
+                  Favorite Locations
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                   {favoriteLocations.map((location, index) => (
@@ -1251,16 +1235,48 @@ function WeatherApp() {
         {/* Enhanced Footer */}
         <footer className="text-center mt-12 sm:mt-20 text-white/70 space-y-3 sm:space-y-4">
           <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-6 text-sm sm:text-base">
-            <span>✨ Built with ❤️ and way too much coffee ☕</span>
+            <span>Built with ❤ and way too much ☕</span>
             <span className="hidden sm:inline">•</span>
-            <span>🌍 Real-time updates with 5-day & hourly forecasts</span>
+            <span>Real-time updates with 6-day & hourly forecasts</span>
           </div>
           <div className="flex items-center justify-center space-x-2 sm:space-x-3 text-xs sm:text-sm">
             <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" />
             <span>Powered by OpenWeatherMap API</span>
             <Star className="w-3 h-3 animate-pulse" />
           </div>
-          <div className="text-xs text-white/50">v2.1.1 • Enhanced with better performance and error handling</div>
+
+          {/* Developer Links */}
+          <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-4 text-xs sm:text-sm">
+            <span className="text-white/60">Developed by Sujan Das</span>
+            <div className="flex items-center space-x-4">
+              <a
+                href="https://github.com/devsujandas"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white/60 hover:text-white transition-colors duration-300 flex items-center space-x-1"
+              >
+                <span>GitHub</span>
+              </a>
+              <a
+                href="https://in.linkedin.com/in/devsujandas"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white/60 hover:text-white transition-colors duration-300 flex items-center space-x-1"
+              >
+                <span>LinkedIn</span>
+              </a>
+              <a
+                href="https://www.sujandas.info/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white/60 hover:text-white transition-colors duration-300 flex items-center space-x-1"
+              >
+                <span>Portfolio</span>
+              </a>
+            </div>
+          </div>
+
+          <div className="text-xs text-white/50">v2.1.3 • Enhanced with better performance and error handling</div>
         </footer>
       </div>
     </div>

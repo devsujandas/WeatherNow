@@ -190,7 +190,7 @@ function transformWeatherData(currentData: any, forecastData?: any): WeatherData
     const hourly: HourlyForecast[] = []
 
     if (forecastData?.list && Array.isArray(forecastData.list)) {
-      const dailyForecasts = forecastData.list.filter((_: any, index: number) => index % 8 === 4).slice(0, 5)
+      const dailyForecasts = forecastData.list.filter((_: any, index: number) => index % 8 === 4).slice(0, 6)
 
       dailyForecasts.forEach((item: any) => {
         if (item && item.main && item.weather && Array.isArray(item.weather) && item.weather.length > 0) {
