@@ -1260,7 +1260,7 @@ function WeatherApp() {
             <span>Powered by OpenWeatherMap API</span>
             <Star className="w-3 h-3 animate-pulse" />
           </div>
-          <div className="text-xs text-white/50">v2.0.0 • Enhanced with better performance and error handling</div>
+          <div className="text-xs text-white/50">v2.1.1 • Enhanced with better performance and error handling</div>
         </footer>
       </div>
     </div>
