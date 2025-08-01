@@ -580,7 +580,7 @@ function WeatherApp() {
               <Star className="absolute -top-1 -right-1 w-4 h-4 text-yellow-300 animate-pulse" />
             </div>
             <h1 className="text-4xl sm:text-6xl md:text-8xl font-bold bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent drop-shadow-2xl">
-              Weather Now
+              WeatherNow
             </h1>
           </div>
           <p className="text-white/95 text-base sm:text-2xl font-medium mb-4">
